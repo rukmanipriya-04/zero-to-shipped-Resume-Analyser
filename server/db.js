@@ -8,8 +8,12 @@ const resumeSchema = new mongoose.Schema(
     text: { type: String, required: true },
     jobDescription: { type: String, required: true },
     score: { type: Number, min: 0, max: 100, default: null },
+    summary: { type: String, required: true },
     matchedKeywords: { type: [String], default: [] },
     missingKeywords: { type: [String], default: [] },
+    strengths: { type: [String], default: [] },
+    recommendations: { type: [String], default: [] },
+    creditsPercentLeft: { type: Number, min: 0, max: 100, default: null },
   },
   { timestamps: true },
 )

@@ -252,11 +252,11 @@ function App() {
             <div>
               <span className="section-index">03 / YOUR MATCH</span>
               <h2 id="results-title">Your resume, against the role.</h2>
-              <p>Keyword coverage gives you a practical starting point for tailoring your application.</p>
+              <p>{result.summary}</p>
             </div>
             <div className="analysis-score" aria-label={`Fit score ${result.score} out of 100`}>
               <strong>{result.score}<span>/100</span></strong>
-              <span>FIT SCORE</span>
+              <span>LABD SCORE</span>
             </div>
           </div>
           <div className="keyword-groups">
@@ -273,6 +273,23 @@ function App() {
               ) : <p>All identified job-description keywords appear in your resume.</p>}
             </div>
           </div>
+          <div className="analysis-feedback">
+            <section>
+              <h3>Relevant strengths</h3>
+              {result.strengths.length ? (
+                <ul>{result.strengths.map((strength) => <li key={strength}>{strength}</li>)}</ul>
+              ) : <p>No strengths were returned for this review.</p>}
+            </section>
+            <section>
+              <h3>Ways to strengthen your application</h3>
+              {result.recommendations.length ? (
+                <ul>{result.recommendations.map((recommendation) => <li key={recommendation}>{recommendation}</li>)}</ul>
+              ) : <p>No recommendations were returned for this review.</p>}
+            </section>
+          </div>
+          {Number.isFinite(result.creditsPercentLeft) && (
+            <p className="credits-status">LABD allowance: {result.creditsPercentLeft}% remaining</p>
+          )}
         </section>
       )}
 
