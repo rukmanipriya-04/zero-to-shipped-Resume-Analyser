@@ -1,0 +1,20 @@
+{
+  "name": "resume-analyser-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=22.3.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.2",
+    "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5"
+  }
+}
