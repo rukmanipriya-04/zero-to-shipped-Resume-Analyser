@@ -7,14 +7,17 @@ export async function uploadResume(req, res) {
     throw new ApiError(400, 'RESUME_REQUIRED', 'Attach a PDF in the "resume" field.')
   }
 
-  const scoreValue = req.body.score
-  const score = scoreValue === undefined || scoreValue === '' ? null : Number(scoreValue)
+  const jobDescription = req.body.jobDescription?.trim()
 
-  if (score !== null && (!Number.isFinite(score) || score < 0 || score > 100)) {
-    throw new ApiError(400, 'INVALID_SCORE', 'Score must be a number between 0 and 100.')
+  if (!jobDescription) {
+    throw new ApiError(400, 'JOB_DESCRIPTION_REQUIRED', 'Add the job description to score your resume.')
   }
 
-  const resume = await extractResume(req.file, score)
+  if (jobDescription.length > 20000) {
+    throw new ApiError(413, 'JOB_DESCRIPTION_TOO_LARGE', 'The job description must be 20,000 characters or less.')
+  }
+
+  const resume = await extractResume(req.file, jobDescription)
   return res.json({ success: true, ...resume })
 }
 

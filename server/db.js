@@ -6,7 +6,10 @@ const resumeSchema = new mongoose.Schema(
     contentType: { type: String, required: true },
     sizeBytes: { type: Number, required: true },
     text: { type: String, required: true },
+    jobDescription: { type: String, required: true },
     score: { type: Number, min: 0, max: 100, default: null },
+    matchedKeywords: { type: [String], default: [] },
+    missingKeywords: { type: [String], default: [] },
   },
   { timestamps: true },
 )

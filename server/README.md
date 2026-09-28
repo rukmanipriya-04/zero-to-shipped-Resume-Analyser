@@ -8,8 +8,8 @@ Copy-Item .env.example .env
 npm start
 ```
 
-`POST /api/resume` accepts one PDF as `multipart/form-data` in the `resume` field. Files must be 5 MB or smaller. Add an optional `score` field between 0 and 100. The extracted text, score, and upload metadata are saved in MongoDB and successful requests return `{ "success": true, "id": "...", "filename": "...", "text": "...", "score": null }` (or the supplied score).
+`POST /api/resume` accepts a PDF in the `resume` field and a `jobDescription` field as `multipart/form-data`. PDFs must be 5 MB or smaller; job descriptions may contain up to 20,000 characters. The server calculates a keyword-overlap score from 0 to 100 and saves the extracted text, job description, score, and matched/missing keywords in MongoDB.
 
 The server builds the Atlas connection string from `MONGODB_USERNAME` and `MONGODB_PASSWORD`, selecting `MONGODB_DATABASE` (default `resume-analyser`). A `MONGODB_URI` can override Atlas, for example when using a local MongoDB. Credentials from `.env` take precedence; `.env.example` is loaded as a fallback. Avoid committing real credentials in `.env.example`, which is commonly checked into source control. The original PDF is processed in memory and is not stored. Set `PORT` to change the default port (`3001`), or `FRONTEND_ORIGIN` to change the allowed frontend origin (default `http://localhost:5173`).
 
-For a single-project Vercel deployment, keep the Vercel project root at the repository root. The root `vercel.json` builds `frontend/`, serves `frontend/dist`, and routes `/api/*` to a serverless Express function. Add `MONGODB_USERNAME`, `MONGODB_PASSWORD`, and optionally `MONGODB_DATABASE` as Vercel environment variables; do not rely on `.env.example` in production.
+For local development, start the API and frontend separately; Vite proxies `/api` to the API on port `3001`. For Vercel, keep the project root at the repository root. The root `vercel.json` deploys the Vite frontend and Express server as same-project services. Add `MONGODB_USERNAME`, `MONGODB_PASSWORD`, and optionally `MONGODB_DATABASE` as Vercel environment variables; do not rely on `.env.example` in production.

@@ -10,7 +10,7 @@ const upload = multer({
   limits: { fileSize: maxUploadSize, files: 1 },
   fileFilter(req, file, callback) {
     if (
-      file.mimetype !== 'application/pdf' ||
+      !['application/pdf', 'application/octet-stream'].includes(file.mimetype) ||
       extname(file.originalname).toLowerCase() !== '.pdf'
     ) {
       callback(new ApiError(415, 'PDF_ONLY', 'Upload a PDF file.'))

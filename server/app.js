@@ -12,6 +12,9 @@ if (process.env.FRONTEND_ORIGIN) {
   app.use(cors({ origin: 'http://localhost:5173' }))
 }
 
+app.get('/health', (req, res) => {
+  res.json({ success: true })
+})
 app.use('/api/resume', resumeRoutes)
 app.use((req, res, next) => {
   next(new ApiError(404, 'NOT_FOUND', 'The requested endpoint does not exist.'))
