@@ -1,8 +1,5 @@
 import 'dotenv/config'
-import dotenv from 'dotenv'
 import { connectToDatabase } from './db.js'
-
-dotenv.config({ path: '.env.example', override: false })
 
 const { default: app } = await import('./app.js')
 const port = Number(process.env.PORT) || 3001
@@ -14,7 +11,10 @@ async function startServer() {
   })
 }
 
-startServer().catch(() => {
+startServer().catch((error) => {
   console.error('Unable to connect to MongoDB. Check credentials and Atlas network access.')
+  if (error?.message) {
+    console.error(error.message)
+  }
   process.exitCode = 1
 })

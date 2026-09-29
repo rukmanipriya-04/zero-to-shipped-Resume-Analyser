@@ -1,3 +1,4 @@
+import dns from 'node:dns'
 import mongoose from 'mongoose'
 
 const resumeSchema = new mongoose.Schema(
@@ -23,19 +24,14 @@ export const Resume = mongoose.models.Resume ?? mongoose.model('Resume', resumeS
 export async function connectToDatabase() {
   const username = process.env.MONGODB_USERNAME
   const password = process.env.MONGODB_PASSWORD
-  const database = process.env.MONGODB_DATABASE ?? 'resume-analyser'
 
   if (!username || !password) {
     throw new Error('MongoDB username or password is missing.')
   }
 
-  const uri = new URL('mongodb+srv://cluster0.9nu6nax.mongodb.net/')
-  uri.pathname = `/${encodeURIComponent(database)}`
-  uri.searchParams.set('appName', 'Cluster0')
-  uri.username = username
-  uri.password = password
+  const uri = `mongodb+srv://${encodeURIComponent(username)}:${encodeURIComponent(password)}@cluster0.9nu6nax.mongodb.net/?appName=Cluster0`
 
-  await mongoose.connect(uri.toString())
-
+  dns.setServers(['8.8.8.8', '1.1.1.1'])
+  await mongoose.connect(uri)
   console.log('Connected to MongoDB Atlas')
 }
