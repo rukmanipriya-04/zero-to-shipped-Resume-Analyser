@@ -1,20 +1,17 @@
-import 'dotenv/config'
-import dotenv from 'dotenv'
 import { connectToDatabase } from './db.js'
 
-dotenv.config({ path: '.env.example', override: false })
-
 const { default: app } = await import('./app.js')
-const port = Number(process.env.PORT) || 3001
 
-async function startServer() {
-  await connectToDatabase()
-  app.listen(port, () => {
-    console.log(`Resume analysis API listening on port ${port}`)
-  })
+export default async function handler(req, res) {
+  try {
+    await connectToDatabase()
+    return app(req, res)
+  } catch (error) {
+    console.error('Unable to connect to MongoDB:', error)
+
+    return res.status(500).json({
+      error: 'DATABASE_CONNECTION_FAILED',
+      message: 'Unable to connect to MongoDB.',
+    })
+  }
 }
-
-startServer().catch(() => {
-  console.error('Unable to connect to MongoDB. Check credentials and Atlas network access.')
-  process.exitCode = 1
-})

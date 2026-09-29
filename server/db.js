@@ -21,24 +21,21 @@ const resumeSchema = new mongoose.Schema(
 export const Resume = mongoose.models.Resume ?? mongoose.model('Resume', resumeSchema)
 
 export async function connectToDatabase() {
-  if (process.env.MONGODB_URI) {
-    await mongoose.connect(process.env.MONGODB_URI)
-    console.log('Connected to MongoDB')
-    return
-  }
-
-  const { MONGODB_USERNAME: username, MONGODB_PASSWORD: password } = process.env
+  const username = process.env.MONGODB_USERNAME
+  const password = process.env.MONGODB_PASSWORD
+  const database = process.env.MONGODB_DATABASE ?? 'resume-analyser'
 
   if (!username || !password) {
-    throw new Error('MongoDB credentials are missing.')
+    throw new Error('MongoDB username or password is missing.')
   }
 
   const uri = new URL('mongodb+srv://cluster0.9nu6nax.mongodb.net/')
-  uri.pathname = `/${encodeURIComponent(process.env.MONGODB_DATABASE ?? 'resume-analyser')}`
+  uri.pathname = `/${encodeURIComponent(database)}`
   uri.searchParams.set('appName', 'Cluster0')
   uri.username = username
   uri.password = password
 
   await mongoose.connect(uri.toString())
+
   console.log('Connected to MongoDB Atlas')
 }
