@@ -16,12 +16,5 @@
     { "source": "/health", "destination": { "service": "server" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
-  {
-  "functions": {
-    "api/[...path].js": {
-      "maxDuration": 60,
-      "includeFiles": "node_modules/@napi-rs/canvas/**"
-    }
-  }
-}
+ 
 }
