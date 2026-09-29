@@ -16,5 +16,4 @@
     { "source": "/health", "destination": { "service": "server" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
- 
 }
