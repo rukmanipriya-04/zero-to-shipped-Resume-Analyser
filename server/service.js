@@ -60,13 +60,15 @@ function isTransientGeminiUnavailable(error) {
   if (status !== undefined && status !== null && status !== '') {
     const statusCode = Number(status)
     if (Number.isFinite(statusCode)) {
-      return statusCode === 503
+      return statusCode === 429 || statusCode === 503
     }
   }
 
-  return error?.code === 'UNAVAILABLE'
-    || error?.error?.status === 'UNAVAILABLE'
-    || /\bUNAVAILABLE\b/i.test(error?.message ?? '')
+  const transientCodes = ['UNAVAILABLE', 'RESOURCE_EXHAUSTED', 'TOO_MANY_REQUESTS']
+  const errorCode = error?.code ?? error?.error?.status ?? error?.error?.code
+
+  return transientCodes.includes(errorCode)
+    || new RegExp(`\\b(?:${transientCodes.join('|')})\\b`, 'i').test(error?.message ?? '')
 }
 
 async function requestGeminiAnalysis(resumeText, jobDescription) {
