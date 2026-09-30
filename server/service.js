@@ -55,6 +55,20 @@ function parseAnalysis(raw) {
   }
 }
 
+function isTransientGeminiUnavailable(error) {
+  const status = error?.status ?? error?.response?.status
+  if (status !== undefined && status !== null && status !== '') {
+    const statusCode = Number(status)
+    if (Number.isFinite(statusCode)) {
+      return statusCode === 503
+    }
+  }
+
+  return error?.code === 'UNAVAILABLE'
+    || error?.error?.status === 'UNAVAILABLE'
+    || /\bUNAVAILABLE\b/i.test(error?.message ?? '')
+}
+
 async function requestGeminiAnalysis(resumeText, jobDescription) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -76,26 +90,40 @@ async function requestGeminiAnalysis(resumeText, jobDescription) {
   ].join('\n\n')
 
   try {
-    const response = await ai.models.generateContent({
-      model: geminiModel,
-      contents: prompt,
-      config: {
-        temperature: 0.2,
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            score: { type: Type.INTEGER, minimum: 0, maximum: 100 },
-            summary: { type: Type.STRING },
-            matchedKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
-            missingKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
-            strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-            recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+    const retryDelays = [2000, 4000, 8000]
+    let response
+
+    for (let retryCount = 0; ; retryCount += 1) {
+      try {
+        response = await ai.models.generateContent({
+          model: geminiModel,
+          contents: prompt,
+          config: {
+            temperature: 0.2,
+            responseMimeType: 'application/json',
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                score: { type: Type.INTEGER, minimum: 0, maximum: 100 },
+                summary: { type: Type.STRING },
+                matchedKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
+                missingKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
+                strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+                recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+              },
+              required: ['score', 'summary', 'matchedKeywords', 'missingKeywords', 'strengths', 'recommendations'],
+            },
           },
-          required: ['score', 'summary', 'matchedKeywords', 'missingKeywords', 'strengths', 'recommendations'],
-        },
-      },
-    })
+        })
+        break
+      } catch (error) {
+        if (!isTransientGeminiUnavailable(error) || retryCount >= retryDelays.length) {
+          throw error
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, retryDelays[retryCount]))
+      }
+    }
 
     const extractedText = typeof response?.text === 'string'
       ? response.text
