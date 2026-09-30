@@ -256,7 +256,7 @@ function App() {
             </div>
             <div className="analysis-score" aria-label={`Fit score ${result.score} out of 100`}>
               <strong>{result.score}<span>/100</span></strong>
-              <span>LABD SCORE</span>
+              <span>AI SCORE</span>
             </div>
           </div>
           <div className="keyword-groups">
@@ -287,9 +287,6 @@ function App() {
               ) : <p>No recommendations were returned for this review.</p>}
             </section>
           </div>
-          {Number.isFinite(result.creditsPercentLeft) && (
-            <p className="credits-status">LABD allowance: {result.creditsPercentLeft}% remaining</p>
-          )}
         </section>
       )}
 

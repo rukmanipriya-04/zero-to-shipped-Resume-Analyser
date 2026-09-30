@@ -1,0 +1,10 @@
+{
+  "name": "resume-analyser",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others --names frontend,backend \"npm run dev --prefix frontend\" \"npm start --prefix server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

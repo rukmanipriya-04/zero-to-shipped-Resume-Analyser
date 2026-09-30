@@ -111,6 +111,21 @@ async function requestGeminiAnalysis(resumeText, jobDescription) {
 
     return parseAnalysis(extractedText)
   } catch (error) {
+    const safeDiagnosticValue = (value) => {
+      if (typeof value === 'string') {
+        return apiKey ? value.split(apiKey).join('[REDACTED]') : value
+      }
+
+      return typeof value === 'number' || typeof value === 'boolean' ? value : undefined
+    }
+
+    console.error('[Gemini analysis error]', {
+      name: safeDiagnosticValue(error?.name),
+      message: safeDiagnosticValue(error?.message),
+      status: safeDiagnosticValue(error?.status ?? error?.response?.status),
+      code: safeDiagnosticValue(error?.code),
+    })
+
     if (error instanceof ApiError) {
       throw error
     }
